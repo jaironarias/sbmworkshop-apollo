@@ -1,4 +1,5 @@
-const { ApolloServer, gql } = require('apollo-server');
+import { ApolloServer, gql } from 'apollo-server';
+var db = new loki('loki.json');
 
 // This is a (sample) collection of books we'll be able to query
 // the GraphQL server for.  A more complete example might fetch
@@ -25,10 +26,11 @@ const typeDefs = gql`
     author: String
   }
 
-  # The "Query" type is the root of all GraphQL queries.
-  # (A "Mutation" type will be covered later on.)
   type Query {
     books: [Book]
+  }
+
+  type Mutation {
     addBook(title: String, author: String): Book
   }
 `;
@@ -38,6 +40,8 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     books: () => books,
+  },
+  Mutation: {
     addBook: (root,args) => {
         item = { 'title': args.title, 'author': args.author };
         books.push(item);
