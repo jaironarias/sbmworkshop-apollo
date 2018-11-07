@@ -1,7 +1,24 @@
 const { ApolloServer, gql } = require('apollo-server');
 const loki = require("lokijs");
+
+const books = [
+  {
+    title: 'Harry Potter and the Chamber of Secrets',
+    author: 'J.K. Rowling',
+  },
+  {
+    title: 'Jurassic Park',
+    author: 'Michael Crichton',
+  },
+];
+
 const db = new loki('books.json',{'autosave':true,'autoload':true,'serializationMethod':'pretty'});
-var cbooks = db.getCollection("books");
+var cbooks = db.addCollection("books");
+
+if(cbooks.count() == 0 && cbooks.insert(books)) {
+  console.log("Added books")
+}
+
 
 // This is a (sample) collection of books we'll be able to query
 // the GraphQL server for.  A more complete example might fetch
@@ -18,8 +35,15 @@ const typeDefs = gql`
     author: String
   }
 
+  type Date {
+    now: String
+    allo: String
+  }
+
   type Query {
     books: [Book]
+    qbooks(myquery:String): [Book] 
+    date: Date
   }
 
   type Mutation {
@@ -32,15 +56,24 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     books: () => {
-      console.log(cbooks.find({}));
-
       return (cbooks.find({}));
     },
+    qbooks: (root,args) => {
+      mq = JSON.parse(args.myquery)
+      return (cbooks.find(mq));
+    },
+    date: () => (
+      {
+        now: Date(),
+        allo: "Hello, World! "+ Date()
+      }
+    ),
   },
   Mutation: {
     addBook: (root,args) => {
         item = { 'title': args.title, 'author': args.author };
         cbooks.insert(item);
+        db.save();
         return item;
     }
   }

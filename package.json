@@ -22,7 +22,9 @@
     "nodemon": "^1.18.5"
   },
   "nodemonConfig": {
-    "ignore": ["books.json"],
+    "ignore": [
+      "books.json"
+    ],
     "delay": "2500"
   }
 }
